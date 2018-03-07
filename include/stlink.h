@@ -1,9 +1,3 @@
-/*
- * File:   stlink.h
- *
- * This should contain all the common top level stlink interfaces, regardless
- * of how the backend does the work....
- */
 #ifndef STLINK_H
 #define STLINK_H
 
@@ -15,77 +9,7 @@
 extern "C" {
 #endif
 
-#define STLINK_ARRAY_SIZE(x) (sizeof(x)/sizeof(x[0]))
-
-    // Max data transfer size.
-    // 6kB = max mem32_read block, 8kB sram
-    //#define Q_BUF_LEN	96
-#define Q_BUF_LEN			(1024 * 100)
-
-    // STLINK_DEBUG_RESETSYS, etc:
-#define STLINK_CORE_RUNNING		0x80
-#define STLINK_CORE_HALTED		0x81
-#define STLINK_CORE_STAT_UNKNOWN	-1
-
-#define STLINK_GET_VERSION		0xf1
-#define STLINK_GET_CURRENT_MODE	0xf5
-#define STLINK_GET_TARGET_VOLTAGE	0xF7
-
-#define STLINK_DEBUG_COMMAND		0xF2
-#define STLINK_DFU_COMMAND		0xF3
-#define STLINK_DFU_EXIT		0x07
-
-    // STLINK_GET_CURRENT_MODE
-#define STLINK_DEV_DFU_MODE		0x00
-#define STLINK_DEV_MASS_MODE		0x01
-#define STLINK_DEV_DEBUG_MODE		0x02
-#define STLINK_DEV_UNKNOWN_MODE	-1
-
-    // TODO - possible poor names...
-#define STLINK_SWD_ENTER 0x30
-#define STLINK_SWD_READCOREID 0x32  // TBD
-#define STLINK_JTAG_WRITEDEBUG_32BIT 0x35
-#define STLINK_JTAG_READDEBUG_32BIT 0x36
-#define STLINK_JTAG_DRIVE_NRST 0x3c
-
-#define STLINK_DEBUG_APIV2_SWD_SET_FREQ    0x43
-
-    /* cortex core ids */
-    // TODO clean this up...
-#define STM32VL_CORE_ID 0x1ba01477
-#define STM32F7_CORE_ID 0x5ba02477
-
-    // Constant STM32 memory map figures
-#define STM32_FLASH_BASE 0x08000000
-#define STM32_SRAM_BASE 0x20000000
-
-// Baud rate divisors for SWDCLK
-#define STLINK_SWDCLK_4MHZ_DIVISOR		0
-#define STLINK_SWDCLK_1P8MHZ_DIVISOR	1
-#define STLINK_SWDCLK_1P2MHZ_DIVISOR	2
-#define STLINK_SWDCLK_950KHZ_DIVISOR	3
-#define STLINK_SWDCLK_480KHZ_DIVISOR	7
-#define STLINK_SWDCLK_240KHZ_DIVISOR	15
-#define STLINK_SWDCLK_125KHZ_DIVISOR	31
-#define STLINK_SWDCLK_100KHZ_DIVISOR	40
-#define STLINK_SWDCLK_50KHZ_DIVISOR		79
-#define STLINK_SWDCLK_25KHZ_DIVISOR		158
-#define STLINK_SWDCLK_15KHZ_DIVISOR		265
-#define STLINK_SWDCLK_5KHZ_DIVISOR		798
-
-
-
-    /* Enough space to hold both a V2 command or a V1 command packaged as generic scsi*/
-#define C_BUF_LEN 32
-
-    enum stlink_flash_type {
-        STLINK_FLASH_TYPE_UNKNOWN = 0,
-        STLINK_FLASH_TYPE_F0,
-        STLINK_FLASH_TYPE_L0,
-        STLINK_FLASH_TYPE_F4,
-        STLINK_FLASH_TYPE_L4,
-        STLINK_FLASH_TYPE_F1_XL,
-    };
+#include "stlink/defines.h"
 
     struct stlink_reg {
         uint32_t r[16];
@@ -123,13 +47,6 @@ typedef struct flash_loader {
         uint32_t st_vid;
         uint32_t stlink_pid;
     } stlink_version_t;
-
-    enum transport_type {
-        TRANSPORT_TYPE_ZERO = 0,
-        TRANSPORT_TYPE_LIBSG,
-        TRANSPORT_TYPE_LIBUSB,
-        TRANSPORT_TYPE_INVALID
-    };
 
     typedef struct _stlink stlink_t;
 
@@ -232,6 +149,7 @@ typedef struct flash_loader {
 #include "stlink/commands.h"
 #include "stlink/chipid.h"
 #include "stlink/flash_loader.h"
+
 #include "stlink/version.h"
 
 #ifdef __cplusplus

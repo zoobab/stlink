@@ -7,8 +7,7 @@ extern "C" {
 
 /**
  * Chip IDs are explained in the appropriate programming manual for the
- * DBGMCU_IDCODE register (0xE0042000)
- * stm32 chipids, only lower 12 bits..
+ * DBGMCU_IDCODE register where STM32 uC chipids use only lower 12 bits
  */
 enum stlink_stm32_chipids {
 	STLINK_CHIPID_UNKNOWN                = 0x000,
@@ -62,9 +61,9 @@ enum stlink_stm32_chipids {
 	STLINK_CHIPID_STM32_F303_HIGH        = 0x446,
 	STLINK_CHIPID_STM32_L0_CAT5          = 0x447,
 	STLINK_CHIPID_STM32_F0_CAN           = 0x448,
-	STLINK_CHIPID_STM32_F7               = 0x449,	/* This ID is found on the NucleoF746ZG board */
+	STLINK_CHIPID_STM32_F7               = 0x449,
 	STLINK_CHIPID_STM32_F7XXXX           = 0x451,
-	STLINK_CHIPID_STM32_F72XXX           = 0x452,	/* This ID is found on the NucleoF722ZE board */
+	STLINK_CHIPID_STM32_F72XXX           = 0x452,
 	STLINK_CHIPID_STM32_L011             = 0x457,
 	STLINK_CHIPID_STM32_F410             = 0x458,
 	STLINK_CHIPID_STM32_F413             = 0x463

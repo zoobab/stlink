@@ -7,6 +7,11 @@
 #define FLASH_REGS_BANK2_OFS 0x40
 #define FLASH_BANK2_START_ADDR 0x08080000
 
+/* cortex core ids */
+// TODO clean this up...
+#define STM32VL_CORE_ID 0x1ba01477
+#define STM32F7_CORE_ID 0x5ba02477
+
 /* from openocd, contrib/loaders/flash/stm32.s */
 static const uint8_t loader_code_stm32vl[] = {
         0x08, 0x4c, /* ldr	r4, STM32_FLASH_BASE */

@@ -526,7 +526,7 @@ char* make_memory_map(stlink_t *sl) {
         strcpy(map, memory_map_template_F4);
     } else if(sl->chip_id==STLINK_CHIPID_STM32_F4_DE) {
         strcpy(map, memory_map_template_F4_DE);
-    } else if(sl->core_id==STM32F7_CORE_ID) {
+    } else if(sl->core_id==STLINK_STM32_COREID_F7) {
         snprintf(map, sz, memory_map_template_F7,
                 (unsigned int)sl->sram_size);
     } else if(sl->chip_id==STLINK_CHIPID_STM32_F4_HD) {
@@ -714,7 +714,7 @@ static int update_code_breakpoint(stlink_t *sl, stm32_addr_t addr, int set) {
         return -1;
     }
 
-	if (sl->core_id==STM32F7_CORE_ID) {
+	if (sl->core_id==STLINK_STM32_COREID_F7) {
 		fpb_addr = addr;
 	} else {
 		fpb_addr = addr & ~0x3;
@@ -738,7 +738,7 @@ static int update_code_breakpoint(stlink_t *sl, stm32_addr_t addr, int set) {
 
     bp->addr = fpb_addr;
 
-	if (sl->core_id==STM32F7_CORE_ID) {
+	if (sl->core_id==STLINK_STM32_COREID_F7) {
 		if(set) bp->type = type;
 		else	bp->type = 0;
 
@@ -947,7 +947,7 @@ static void init_cache (stlink_t *sl) {
   int i;
 
   /* Assume only F7 has a cache.  */
-  if(sl->core_id!=STM32F7_CORE_ID)
+  if(sl->core_id!=STLINK_STM32_COREID_F7)
     return;
 
   stlink_read_debug32(sl, CLIDR, &clidr);
@@ -1028,7 +1028,7 @@ static void cache_sync(stlink_t *sl)
 {
   unsigned ccr;
 
-  if(sl->core_id!=STM32F7_CORE_ID)
+  if(sl->core_id!=STLINK_STM32_COREID_F7)
     return;
   if (!cache_modified)
     return;
@@ -1150,7 +1150,7 @@ int serve(stlink_t *sl, st_state_t *st) {
                 if(!strcmp(queryName, "Supported")) {
                     if(sl->chip_id==STLINK_CHIPID_STM32_F4
                        || sl->chip_id==STLINK_CHIPID_STM32_F4_HD
-                       || sl->core_id==STM32F7_CORE_ID) {
+                       || sl->core_id==STLINK_STM32_COREID_F7) {
                         reply = strdup("PacketSize=3fff;qXfer:memory-map:read+;qXfer:features:read+");
                     }
                     else {

@@ -30,6 +30,9 @@
 #define FLASH_REGS_ADDR 0x40022000
 #define FLASH_REGS_SIZE 0x28
 
+#define STM32_FLASH_BASE 0x08000000
+#define STM32_SRAM_BASE 0x20000000
+
 #define FLASH_ACR (FLASH_REGS_ADDR + 0x00)
 #define FLASH_KEYR (FLASH_REGS_ADDR + 0x04)
 #define FLASH_SR (FLASH_REGS_ADDR + 0x0c)
@@ -583,16 +586,36 @@ int stlink_core_id(stlink_t *sl) {
     return ret;
 }
 
-int stlink_chip_id(stlink_t *sl, uint32_t *chip_id) {
+int stlink_chip_id(stlink_t *sl, uint32_t *chipid) {
     int ret;
 
-    ret = stlink_read_debug32(sl, 0xE0042000, chip_id);
-    if (ret == -1)
-        return ret;
+	switch (sl->core_id) {
+	case STLINK_STM32_COREID_L0:
+		ret = stlink_read_debug32(sl, 0x40015800, chipid);
+		break;
+	case STLINK_STM32_COREID_CORTEX:
+    		ret = stlink_read_debug32(sl, 0xE0042000, chipid);
+		break;
+	case STLINK_STM32_COREID_H7:
+		ret = stlink_read_debug32(sl, 0x5C001000, chipid);
+		break;
+	}
 
-    if (*chip_id == 0)
-        ret = stlink_read_debug32(sl, 0x40015800, chip_id);    //Try Corex M0 DBGMCU_IDCODE register address
+	if (ret == -1)
+		return ret;
 
+
+    *chipid &= 0xfff;
+
+    /* Fix chip_id for F4 rev A errata , Read CPU ID, as CoreID is the same for F2/F4*/
+    if (*chipid == 0x411) {
+        uint32_t cpuid;
+        stlink_read_debug32(sl, 0xE000ED00, &cpuid);
+        if ((cpuid  & 0xfff0) == 0xc240)
+            *chipid = 0x413;
+    }
+
+    sl->chip_id = *chipid;
     return ret;
 }
 
@@ -622,19 +645,11 @@ int stlink_cpu_id(stlink_t *sl, cortex_m3_cpuid_t *cpuid) {
 int stlink_load_device_params(stlink_t *sl) {
     ILOG("Loading device parameters....\n");
     const struct stlink_chipid_params *params = NULL;
-    stlink_core_id(sl);
     uint32_t chip_id;
     uint32_t flash_size;
 
+    stlink_core_id(sl);
     stlink_chip_id(sl, &chip_id);
-    sl->chip_id = chip_id & 0xfff;
-    /* Fix chip_id for F4 rev A errata , Read CPU ID, as CoreID is the same for F2/F4*/
-    if (sl->chip_id == 0x411) {
-        uint32_t cpuid;
-        stlink_read_debug32(sl, 0xE000ED00, &cpuid);
-        if ((cpuid  & 0xfff0) == 0xc240)
-            sl->chip_id = 0x413;
-    }
 
     params = stlink_chipid_get_params(sl->chip_id);
     if (params == NULL) {
